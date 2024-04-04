@@ -1,1 +1,1 @@
-# code_pet_projects
+# Здесь находится код pet-projects.

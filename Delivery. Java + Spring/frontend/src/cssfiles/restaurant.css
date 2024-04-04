@@ -1,0 +1,8 @@
+.menu-card .card-title a {
+  color: #9400D3;
+  text-decoration: none;
+}
+
+.menu-card .card-title a:hover {
+  text-decoration: underline;
+}

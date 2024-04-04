@@ -1,0 +1,25 @@
+#clock{
+    border-bottom: #00BFFF 3px solid;
+    display: flex;
+    border-top: #00BFFF 3px solid;
+    border-left: #00BFFF 3px solid;
+    border-right: #00BFFF 3px solid;
+    font-family: sans-serif;
+    padding: 15px;
+    border-radius: 20px;
+    box-shadow: 0 0 20px #000;
+    margin-left: auto;
+    background-color: #FFFFFF;
+}
+#hour{
+    color:#000;
+    font-size:20px;
+}
+#minutes{
+    color:#000;
+    font-size:20px;
+}
+#seconds{
+    color:#000;
+    font-size:20px;
+}
