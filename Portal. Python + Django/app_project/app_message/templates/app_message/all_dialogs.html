@@ -1,0 +1,26 @@
+{% extends 'mainapp/layout.html' %}
+
+{% block title %}
+    Все диалоги
+{% endblock %}
+
+{% block content %}
+    <h2>Все диалоги:</h2>
+<div class="features">
+    <div class="dialogs-list">
+        {% for dialog in all_dialogs %}
+            <div class="dialog-info" id="dialog{{ dialog.id }}">
+                <h3><a href="{% url 'dialog_detail' dialog.id %}">Диалог с {{ dialog.first_owner.first_name }} {{ dialog.first_owner.last_name }} и {{ dialog.second_owner.first_name }} {{ dialog.second_owner.last_name }}</a></h3>
+            </div>
+        {% endfor %}
+    </div>
+    </div>
+    <a href="{% url 'create_dialog' %}" class="btn btn-primary">Создать диалог</a>
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            // Ваш скрипт для фильтрации диалогов, если необходимо
+        });
+    </script>
+{% endblock %}

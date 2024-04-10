@@ -1,0 +1,59 @@
+{% extends 'mainapp/layout.html' %}
+
+{% block title %}
+{% endblock %}
+{% csrf_token %}
+{% block content %}
+       <h3> Профиль </h3>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="features">
+            <div class="profile-container">
+                <div style="color: black">Имя:</div>{{ form.first_name }}
+                {{ form.first_name.errors }}
+                <div style="color: black">Фамилия:</div>{{ form.last_name }}
+                {{ form.last_name.errors }}
+                <div style="color: black">Почта:</div>{{ form.email }}
+                {{ form.email.errors }}
+                <div style="color: black">Номер телефона:</div>{{ form.number }}
+                {{ form.number.errors }}
+                <div style="color: black">Дата рождения:</div>{{ form.birth_date }}
+                {{ form.birth_date.errors }}
+                <div style="color: black">Роль:</div>{{ form.role }}
+                {{ form.role.errors }}
+                <div id="groupField" style="display: none;">
+                    <div style="color: black">Группа:</div>{{ form.group }}
+                    {{ form.group.errors }}
+                </div>
+                <div>
+                    <hr>
+    <p><a href="{% url 'password_change' %}">Сменить пароль</a></p>
+                    <p><button type="submit">Сохранить изменения</button> </p>
+                </div>
+            </div>
+        </div>
+    </form>
+
+
+<script>
+    function checkRoleSelection() {
+        var role = document.getElementById("id_role").value;
+        var groupField = document.getElementById("groupField");
+        console.log(role);
+        if (role === "Студент") {
+            groupField.style.display = "block";
+        } else {
+            groupField.style.display = "none";
+        }
+
+    }
+
+    document.addEventListener("DOMContentLoaded", function() {
+        checkRoleSelection();
+    });
+
+    document.getElementById("id_role").addEventListener("change", function() {
+        checkRoleSelection();
+    });
+</script>
+{% endblock %}

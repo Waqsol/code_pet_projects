@@ -1,0 +1,27 @@
+{% extends 'mainapp/layout.html' %}
+{% block title %}
+    Создание группы
+{% endblock %}
+{% block content %}
+<div class="group-details-container">
+    <h2>Создание группы</h2>
+    {% if error %}
+        <p style="color: red;">{{ error }}</p>
+    {% endif %}
+    <form method="post">
+        {% csrf_token %}
+        <div>
+            <label for="id_name">Название:</label>
+            {{ form.name }}<br>
+            <small style="color: black;" >Только цифры, буквы и символ "-" разрешены.</small>
+        </div>
+        {% if form.instance.pk %}
+            <div style="display: none;">
+                {{ form.captain }}
+            </div>
+        {% endif %}
+        <br>
+        <button type="submit" class="btn btn-info">Создать группу</button>
+    </form>
+</div>
+{% endblock %}

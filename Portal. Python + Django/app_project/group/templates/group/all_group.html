@@ -1,0 +1,55 @@
+{% extends 'mainapp/layout.html' %}
+
+{% block title %}
+    Группы
+{% endblock %}
+
+{% block content %}
+    <div class="search-add-container">
+        <div class="search-form">
+            <input type="text" id="groupSearch" placeholder="Поиск группы">
+        </div>
+        <div class="add-user-button">
+            <a href="{% url 'create_group' %}">
+                <button class="btn btn-info">Добавить группу</button>
+            </a>
+        </div>
+    </div>
+
+    <h2>Группы</h2>
+    <div class="features">
+        <div class="groups-list">
+            {% for group in all_group %}
+                <div class="group-info" id="group{{ group.id }}">
+                    <h3><a href="{% url 'group_details' group.id %}">{{ group.name }}</a></h3>
+
+                    {% if group.captain %}
+                        <p>Староста: {{ group.captain.first_name }} {{ group.captain.last_name }}</p>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            $('#groupSearch').on('keyup', function () {
+                var searchQuery = $(this).val().toLowerCase();
+                filterGroups(searchQuery);
+            });
+
+            function filterGroups(query) {
+                $('.group-info').each(function () {
+                    var groupName = $(this).find('h3').text().toLowerCase();
+                    if (groupName.includes(query)) {
+                        $(this).show();
+                    } else {
+                        $(this).hide();
+                    }
+                });
+            }
+        });
+    </script>
+{% endblock %}

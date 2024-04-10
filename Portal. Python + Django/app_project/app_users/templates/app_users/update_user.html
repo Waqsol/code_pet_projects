@@ -1,0 +1,59 @@
+{% extends 'mainapp/layout.html' %}
+
+{% block title %}
+    Изменить пользователя
+{% endblock %}
+
+{% block content %}
+    <h1>Обновить пользователя</h1>
+    <div class="features" action="{% url 'profile_update' user.pk %}">
+        <div class="profile-container">
+            <form method="post">
+                {% csrf_token %}
+                <div style="color: black">Username:</div> {{ form.username }}
+                {{ form.username.errors }}
+                <div style="color: black">Пароль:</div>{{ form.password1 }}
+                {{ form.password1.errors }}
+                <div style="color: black">Повтор пароля:</div>{{ form.password2 }}
+                {{ form.password2.errors }}
+                <div style="color: black">Почта:</div>{{ form.email }}
+                {{ form.email.errors }}
+                <div style="color: black">Имя:</div>{{ form.first_name }}
+                {{ form.first_name.errors }}
+                <div style="color: black">Фамилия:</div>{{ form.last_name }}
+                {{ form.last_name.errors }}
+                <div style="color: black">Номер телефона:</div>{{ form.number }}
+                {{ form.number.errors }}
+                <div style="color: black">Дата рождения:</div>{{ form.birth_date }}
+                {{ form.birth_date.errors }}
+                <div style="color: black">Роль пользователя:</div>{{ form.role }}
+                {{ form.role.errors }}
+
+                <div id="groupField" style="display: none;">
+                    <div style="color: black">Группа:{{ form.group }}
+                    {{ form.group.errors }}
+                </div>
+                <p><button type="submit">Обновить</button></p>
+            </form>
+        </div>
+    </div>
+    <script>
+        function checkRoleSelection() {
+            var role = document.getElementById("id_role").value;
+            var groupField = document.getElementById("groupField");
+            if (role === "Студент") {
+                groupField.style.display = "block";
+            } else {
+                groupField.style.display = "none";
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            checkRoleSelection();
+        });
+
+        document.getElementById("id_role").addEventListener("change", function () {
+            checkRoleSelection();
+        });
+    </script>
+{% endblock %}

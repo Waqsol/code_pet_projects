@@ -1,0 +1,23 @@
+{% extends 'mainapp/layout.html' %}
+
+{% block title %}
+    Детали группы {{ group.name }}
+{% endblock %}
+
+{% block content %}
+    <div class="group-details-container">
+        <h2>Группа: {{ group.name }}</h2>
+        <h3>Студенты:</h3>
+        <ul>
+            {% for student in students %}
+                    <li>
+                    <div> Инициалы: {{ student.first_name }} {{ student.last_name }}</div>
+                    <div> Почта: {{ student.email }}</div>
+                    <div> Номер: {{ student.number }} </div>
+                    </li>
+            {% endfor %}
+        </ul>
+        <a href="{% url 'group_update' group.id %}" class="btn btn-info">Редактировать</a>
+        <a href="{% url 'group_delete' group.id %}" class="btn btn-danger">Удалить</a>
+    </div>
+{% endblock %}
