@@ -1,0 +1,81 @@
+{% extends 'mainapp/layout.html' %}
+
+{% block title %}
+    Пользователи
+{% endblock %}
+
+{% block content %}
+<div class="search-add-container">
+    <div class="search-form">
+        <input type="text" id="userSearch" placeholder="Поиск пользователя">
+    </div>
+</div>
+
+<h2>Пользователи</h2>
+<div class="features">
+    <h1>{{ title }}</h1>
+
+    <div class="users-list">
+        {% for user in all_users %}
+            <div class="user-info" id="user{{ user.id }}">
+                <h3>{{ user.first_name }} {{ user.last_name }}</h3>
+                <p>
+                    {{ user.role }}
+                    {% if user.role == "Студент" and user.group %}
+                        , {{ user.group }}
+                    {% endif %}<br>
+                    Почта : {{ user.email }}<br>
+                    Номер телефона : {{ user.number }}<br>
+                </p>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js"></script>
+
+<script>
+    $(document).ready(function () {
+        $('#userSearch').on('keyup', function () {
+            var searchQuery = $(this).val().toLowerCase();
+            filterUsers(searchQuery);
+        });
+
+        function filterUsers(query) {
+        $('.user-info').each(function () {
+            var userName = $(this).find('h3').text().toLowerCase();
+            var userGroup = $(this).find('p').text().toLowerCase();
+            if (userName.includes(query) || userGroup.includes(query)) {
+                $(this).show();
+            } else {
+                $(this).hide();
+            }
+        });
+        }
+
+        $('.user-info').each(function() {
+            var user_id = $(this).attr('id').replace('user', '');
+            checkDialog(user_id);
+        });
+
+        function checkDialog(user_id) {
+            $.ajax({
+                type: 'GET',
+                url: '{% url 'get_dialog_id' %}',
+                data: {
+                    user_id: user_id
+                },
+                success: function(response) {
+                    if (response.dialog_id) {
+                        $('#user' + user_id + ' p').append('<a href="/messages/dialog/' + response.dialog_id + '/" class="btn btn-primary open-dialog-btn">Перейти в диалог</a>');
+                    }
+                },
+                error: function(xhr, errmsg, err) {
+                    console.log(errmsg);
+                }
+            });
+        }
+    });
+</script>
+
+{% endblock %}

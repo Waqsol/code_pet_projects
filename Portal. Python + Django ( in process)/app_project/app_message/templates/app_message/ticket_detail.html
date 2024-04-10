@@ -1,0 +1,143 @@
+{% extends 'mainapp/layout.html' %}
+{% load static %}
+
+{% block links %}
+<link rel="stylesheet" href="{% static 'app_message/css/ticket.css' %}"/>
+{% endblock %}
+
+{% block content %}
+<h1>Тикет: {% if ticket.status == 'Закрыт' %}Тикет закрыт{% endif %}</h1>
+<div style="display: none;">
+    <input type="hidden" name="sender_first_name" value="{{ user.first_name }}">
+    <input type="hidden" name="sender_last_name" value="{{ user.last_name }}">
+</div>
+<div class="message-container">
+    {% for message in messages %}
+    <div class="message">
+        <span class="message-sender">{{ message.sender.first_name }} {{ message.sender.last_name }}:</span>
+        <span class="message-content">{{ message.content }}</span>
+        <span class="message-date">- {{ message.date|date:"d.m.y H:i" }}</span>
+    </div>
+    {% endfor %}
+</div>
+<form method="post" id="message-form">
+    {% csrf_token %}
+    <div style="display: none;">
+        {{ form.ticket }}
+    </div>
+    <div style="display: none;">
+        {{ form.sender }}
+    </div>
+    <div>
+        {{ form.content.label_tag }}
+        {{ form.content }}
+    </div>
+    <div style="display: none;">
+        {{ form.date }}
+    </div>
+    <button id="send-button" type="submit">Отправить</button>
+    <button id="close-ticket-btn" type="button">Закрыть тикет</button>
+</form>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const chatSocket = new WebSocket(
+        'ws://'
+        + window.location.host
+        + '/ws/ticket/{{ ticket.id }}/');
+
+    chatSocket.onerror = function(event) {
+        console.error('WebSocket error:', event);
+    };
+    chatSocket.onclose = function(e) {
+        console.error('Chat socket closed unexpectedly');
+    };
+    document.getElementById('close-ticket-btn').addEventListener('click', function(event) {
+        event.preventDefault();
+
+        fetch('{% url "close_ticket" ticket.id %}', {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({'ticket_id': {{ ticket.id }} })
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            // Обновляем интерфейс, делая кнопки невидимыми и блокируя поле для ввода сообщений
+            document.getElementById('close-ticket-btn').style.display = 'none';
+            document.getElementById('send-button').style.display = 'none';
+            document.getElementById('message-form').content.disabled = true;
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+    });
+
+    document.getElementById('message-form').addEventListener('submit', function(event) {
+        event.preventDefault();
+        const formData = new FormData(this);
+
+        fetch(this.action, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}'
+            }
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            const messageContainer = document.querySelector('.message-container');
+            const newMessage = `
+                <div class="message">
+                    <span class="message-sender">${data.sender_first_name} ${data.sender_last_name}:</span>
+                    <span class="message-content">${data.message}</span>
+                </div>`;
+            messageContainer.insertAdjacentHTML('beforeend', newMessage);
+            messageContainer.scrollTop = messageContainer.scrollHeight;
+            document.getElementById('message-form').reset();
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+
+        // Отправляем сообщение с данными о пользователе
+        chatSocket.send(JSON.stringify({
+            'message': formData.get('content'),
+            'sender_first_name': '{{ user.first_name }}',
+            'sender_last_name': '{{ user.last_name }}',
+        }));
+    });
+
+    chatSocket.onmessage = function(e) {
+        const data = JSON.parse(e.data);
+        const messageContainer = document.querySelector('.message-container');
+        const newMessage = `
+            <div class="message">
+                <span class="message-sender">${data.sender_first_name} ${data.sender_last_name}: </span>
+                <span class="message-content">${data.message}</span>
+            </div>`;
+        messageContainer.insertAdjacentHTML('beforeend', newMessage);
+        messageContainer.scrollTop = messageContainer.scrollHeight; // Прокручиваем контейнер сообщений вниз
+    };
+
+    // Проверяем статус тикета при загрузке страницы
+    if ('{{ ticket.status }}' === 'Закрыт') {
+        document.getElementById('close-ticket-btn').style.display = 'none';
+        document.getElementById('send-button').style.display = 'none';
+        document.getElementById('message-form').content.disabled = true;
+    }
+});
+</script>
+{% endblock %}

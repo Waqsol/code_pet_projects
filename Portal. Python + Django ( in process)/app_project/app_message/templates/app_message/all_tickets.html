@@ -1,0 +1,56 @@
+{% extends 'mainapp/layout.html' %}
+
+{% block title %}
+    Все типы сообщений
+{% endblock %}
+
+{% block content %}
+    <div class="search-add-container">
+        <!-- Элементы для поиска и добавления тикетов, если необходимо -->
+    </div>
+
+    <h2>Все тикеты:</h2>
+
+    <div class="features">
+        <div class="groups-list" id="tickets-list">
+            <!-- Сначала отобразить незакрытые тикеты -->
+            {% for ticket in all_tickets %}
+                {% if ticket.sender == request.user or ticket.receiver == request.user %}
+                    {% if ticket.status != 'Закрыт' %}
+                        {% if ticket.theme == 'Дедлайн' %}
+                            <div class="group-info" id="ticket{{ ticket.id }}" data-title="{{ ticket.title }}">
+                                <h3><a href="{% url 'ticket_detail' ticket.id %}">{{ ticket.theme }}</a></h3>
+                                <p>{{ ticket.date }} - {{ ticket.status }}, Дедлайн: {{ ticket.dedline_date }}</p>
+                            </div>
+                        {% else %}
+                            <div class="group-info" id="ticket{{ ticket.id }}" data-title="{{ ticket.title }}">
+                                <h3><a href="{% url 'ticket_detail' ticket.id %}">{{ ticket.theme }}</a></h3>
+                                <p>{{ ticket.date }} - {{ ticket.status }}</p>
+                            </div>
+                        {% endif %}
+                    {% endif %}
+                {% endif %}
+            {% endfor %}
+            <!-- Затем отобразить закрытые тикеты -->
+            {% for ticket in all_tickets %}
+                {% if ticket.sender == request.user or ticket.receiver == request.user %}
+                    {% if ticket.status == 'Закрыт' %}
+                        {% if ticket.theme == 'Дедлайн' %}
+                            <div class="group-info" id="ticket{{ ticket.id }}" data-title="{{ ticket.title }}">
+                                <h3><a href="{% url 'ticket_detail' ticket.id %}">{{ ticket.theme }}</a></h3>
+                                <p>{{ ticket.date }} - {{ ticket.status }}, Дедлайн: {{ ticket.dedline_date }}</p>
+                            </div>
+                        {% else %}
+                            <div class="group-info" id="ticket{{ ticket.id }}" data-title="{{ ticket.title }}">
+                                <h3><a href="{% url 'ticket_detail' ticket.id %}">{{ ticket.theme }}</a></h3>
+                                <p>{{ ticket.date }} - {{ ticket.status }}</p>
+                            </div>
+                        {% endif %}
+                    {% endif %}
+                {% endif %}
+            {% endfor %}
+        </div>
+    </div>
+    <a href="{% url 'create_ticket' %}" class="btn btn-primary">Создать тикет</a>
+
+{% endblock %}
